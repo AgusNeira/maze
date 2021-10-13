@@ -10,21 +10,40 @@ class Movement:
     WEST = lambda x, y, delta: (x - delta, y)
     
     def __init__(self, distance, direction, **kwargs):
+        if 'startPos' in kwargs:
+            self._start = kwargs['startPos']
+        elif 'lastMove' in kwargs:
+            self._start = kwargs['lastMove'].endPosition()
+        else:
+            raise KeyError('Must provide either startPos or lastMve')
+
         self.direction = direction
-        self.distance = distance
+        self._distance = distance
         self.timeDelta = kwargs.get('timeDelta', 0.03)
         self.onEnd = kwargs.get('end', lambda: None)
+        self._bounce = kwargs.get('bounce', False)
 
-        self._now = self.start
-
+        self._now = self._start
         self.time = 0 # 0 to 1, increasing by a rate of step
+
+    @property
+    def start(self):
+        return self._start
+    @start.setter
+    def start(self, nstart):
+        self.time = 0
+        self._start = nstart
+        self._now = self._start
 
     def start(self, pos):
         self.start = pos
 
     def tick(self):
         self.time += self.timeDelta
-        self._now = self.direction(*self.start, self.easeInOut() * self.distance)
+        if self._bounce:
+            self._now = self.direction(*self._start, self.easeInOutBounce() * self._distance)
+        else:
+            self._now = self.direction(*self._start, self.easeInOut() * self._distance)
         if self.time >= 1:
             self.onEnd()
         return self.now
@@ -33,10 +52,39 @@ class Movement:
     def now(self):
         return self._now
 
+    @property
+    def distance(self):
+        return self._distance
+    @distance.setter
+    def distance(self, ndistance):
+        self._distance = ndistance
+
+    @property
+    def bounce(self):
+        return self._bounce
+    @bounce.setter
+    def bounce(self, b):
+        self._bounce = b
+
     def endPosition(self):
-        return self.direction(*self.start, self.distance)
+        if not self._bounce:
+            return self.direction(*self._start, self._distance)
+        else:
+            return self._start
 
     # https://math.stackexchange.com/questions/121720/ease-in-out-function/121755#121755
     def easeInOut(self):
-        return self.time**3 / (self.time**3 + (1 - self.time)**3)
-        
+        return Movement.parametricBlend(self.time, 3)
+
+    def easeInOutBounce(self):
+        twoTimes = self.time * 2
+        if self.time <= 0.5:
+            return Movement.parametricBlend(self.time, 3) * 2
+        else:
+            return (1 - Movement.parametricBlend(self.time, 3)) * 2
+
+    def parametricBlend(x, alpha):
+        return x**alpha / (x**alpha + (1 - x)**alpha)
+
+    def __repr__(self):
+        return '[Movement - distance: {}, start: {}, end: {}]'.format(self.distance, self._start, self.endPosition())
