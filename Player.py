@@ -39,16 +39,28 @@ class Player:
         surface.blit(self.surface, self.position)
 
     def enqueueMovement(self, direction):
-        nmovement = Movement(self._step, direction, end = self.dequeueMovement)
+        if len(self.moves_queue) > 0:
+            nmovement = Movement(self._step,
+                    direction, 
+                    end = self.dequeueMovement,
+                    lastMove = self.moves_queue[-1])
+        else:
+            nmovement = Movement(self._step,
+                    direction,
+                    end = self.dequeueMovement,
+                    startPos = self.position)
+
         self.moves_queue.append(nmovement)
-        if len(self.moves_queue) == 1:
-            self.moves_queue[0].start(self.position)
+        print(self.moves_queue)
+
+        if Player.isOutOfBounds(self.moves_queue[-1].endPosition(), self.size, self.boundaries):
+            self.moves_queue[-1].distance = self._step / 4
+            self.moves_queue[-1].bounce = True            
 
     def dequeueMovement(self):
         nextMoveStart = self.moves_queue[0].endPosition()
         del self.moves_queue[0]
-        if len(self.moves_queue) > 0:
-            self.moves_queue[0].start(nextMoveStart)
+        print(self.moves_queue)
 
     @property
     def size(self):
@@ -62,7 +74,7 @@ class Player:
         if not Player.isOutOfBounds((nx, ny), self.size, self.boundaries):
             self.x, self.y = nx, ny
         else:
-            raise ValueError("New position out of bounds")
+            raise ValueError(f'New position out of bounds: {nx} {ny}')
     @position.setter
     def position(self, npos):
         if not Player.isOutOfBounds(npos, self.size, self.boundaries):
