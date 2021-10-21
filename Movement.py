@@ -8,6 +8,13 @@ class Movement:
     EAST = lambda x, y, delta: (x + delta, y)
     SOUTH = lambda x, y, delta: (x, y + delta)
     WEST = lambda x, y, delta: (x - delta, y)
+
+    def isOutOfBounds(position, bounds):
+        if position[0] < 0 or position[1] < 0:
+            return True
+        if position[0] > bounds[0] or position[1] > bounds[1]:
+            return True
+        return False
     
     def __init__(self, distance, direction, **kwargs):
         if 'startPos' in kwargs:
@@ -23,21 +30,21 @@ class Movement:
         self.onEnd = kwargs.get('end', lambda: None)
         self._bounce = kwargs.get('bounce', False)
 
+        if 'limits' in kwargs:
+            if Movement.isOutOfBounds(self.endPosition(), kwargs['limits']):
+                if self.direction == Movement.NORTH:
+                    self._distance = self._start[1]
+                elif self.direction == Movement.WEST:
+                    self._distance = self.start[0]
+                elif self.direction == Movement.SOUTH:
+                    self._distance = kwargs['limits'][1] - self._start[1]
+                elif self.direction == Movement.EAST:
+                    self._distance = kwargs['limits'][0] - self.start[0]
+                self._bounce = True
+
         self._now = self._start
         self.time = 0 # 0 to 1, increasing by a rate of step
-
-    @property
-    def start(self):
-        return self._start
-    @start.setter
-    def start(self, nstart):
-        self.time = 0
-        self._start = nstart
-        self._now = self._start
-
-    def start(self, pos):
-        self.start = pos
-
+    
     def tick(self):
         self.time += self.timeDelta
         if self._bounce:
@@ -47,6 +54,15 @@ class Movement:
         if self.time >= 1:
             self.onEnd()
         return self.now
+
+    @property
+    def start(self):
+        return self._start
+    @start.setter
+    def start(self, nstart):
+        self.time = 0
+        self._start = nstart
+        self._now = self._start
 
     @property
     def now(self):

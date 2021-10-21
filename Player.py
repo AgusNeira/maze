@@ -43,24 +43,21 @@ class Player:
             nmovement = Movement(self._step,
                     direction, 
                     end = self.dequeueMovement,
-                    lastMove = self.moves_queue[-1])
+                    lastMove = self.moves_queue[-1],
+                    limits = [b - s for b, s in zip(self.boundaries, self.size)])
         else:
             nmovement = Movement(self._step,
                     direction,
                     end = self.dequeueMovement,
-                    startPos = self.position)
+                    startPos = self.position,
+                    limits= [b - s for b, s in zip(self.boundaries, self.size)])
 
         self.moves_queue.append(nmovement)
         print(self.moves_queue)
 
-        if Player.isOutOfBounds(self.moves_queue[-1].endPosition(), self.size, self.boundaries):
-            self.moves_queue[-1].distance = self._step / 4
-            self.moves_queue[-1].bounce = True            
-
     def dequeueMovement(self):
         nextMoveStart = self.moves_queue[0].endPosition()
         del self.moves_queue[0]
-        print(self.moves_queue)
 
     @property
     def size(self):
