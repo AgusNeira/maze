@@ -1,6 +1,7 @@
 import sys, pygame
 from Player import Player
 from Movement import Movement
+from Maze import Maze
 
 pygame.init()
 
@@ -12,6 +13,8 @@ white = pygame.Color(255, 255, 255)
 screen = pygame.display.set_mode(screenSize)
 screen.fill(black)
 
+maze = Maze(10, 15, screenSize)
+
 player = Player(size = (25, 25), boundaries = screenSize, step = 50)
 player.position = 12.5, 12.5
 player.speed = 5
@@ -20,7 +23,7 @@ player.color = 0, 0, 0
 while 1:
     for event in pygame.event.get():
         if event.type == pygame.QUIT: sys.exit()
-        elif event.type == pygame.KEYDOWN:
+        '''elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_UP:
                 player.enqueueMovement(Movement.NORTH)
             elif event.key == pygame.K_DOWN:
@@ -31,10 +34,11 @@ while 1:
                 player.enqueueMovement(Movement.EAST)
         elif event.type == pygame.KEYUP:
             player.movement = None
-    player.tick()
+    player.tick()'''
 
     screen.fill(black)
-    player.draw(screen)
+    maze.draw(screen)
+    #player.draw(screen)
 
     pygame.display.flip()
     pygame.time.delay(10)

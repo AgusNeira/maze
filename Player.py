@@ -53,7 +53,6 @@ class Player:
                     limits= [b - s for b, s in zip(self.boundaries, self.size)])
 
         self.moves_queue.append(nmovement)
-        print(self.moves_queue)
 
     def dequeueMovement(self):
         nextMoveStart = self.moves_queue[0].endPosition()
