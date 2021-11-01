@@ -1,5 +1,6 @@
 import pygame, random
 from functools import reduce
+from Player import Player
 
 class Maze:
     N, S, W, E = 1, 2, 4, 8
@@ -28,6 +29,13 @@ class Maze:
         self._surface.fill(pygame.Color(0, 0, 0))
 
         self.draw_walls()
+
+        playerSize = [self.cellSize / 2] * 2
+        playerOffset = [self.cellSize / 4] * 2
+        self.player = Player(size = playerSize, step = self.cellSize)
+        self.player.position = [pos + off for pos, off in zip(self.position, playerOffset)]
+        self.player.speed = 5
+        self.player.color = 0, 0, 0
 
     def generate(self):
         def choose_index(ceil):
@@ -105,5 +113,12 @@ class Maze:
             end_pos = start_pos[0], (wall[1] + wall[2]) * self.cellSize
             pygame.draw.line(self._surface, wall_color, start_pos, end_pos)
 
+    def tick(self):
+        self.player.tick()
+
     def draw(self, surface):
         surface.blit(self._surface, self.position)
+        self.player.draw(surface)
+
+    def listen(self, event):
+        pass
