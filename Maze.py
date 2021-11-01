@@ -23,12 +23,10 @@ class Maze:
     def generate(self):
         def choose_index(ceil):
             # 50/50 algorithm, varies between recursive backtracker and Prim's algorithm (random)
-            '''if random.choice([True, False]):
+            if random.choice([True, False]):
                 return ceil - 1
             else: 
                 return random.randrange(ceil)
-'''
-            return ceil-1
 
         # Select a random cell to start from
         cells = [(0, 0)]
@@ -48,7 +46,6 @@ class Maze:
                     break
             if curr_cell != -1:
                 del cells[curr_cell]
-        print(self._grid)
 
     def draw_walls(self):
         h_walls = []
@@ -81,8 +78,7 @@ class Maze:
 
         h_walls = reduce(group_h_walls, h_walls[1:], [h_walls[0]])
         v_walls = reduce(group_v_walls, v_walls[1:], [v_walls[0]])
-        print(h_walls)
-        print(v_walls)
+
         # Actual drawing
         cell_size = self._size[0] / self._cols, self._size[1] / self._rows
         wall_color = pygame.Color(255, 255, 255)
