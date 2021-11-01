@@ -13,7 +13,7 @@ white = pygame.Color(255, 255, 255)
 screen = pygame.display.set_mode(screenSize)
 screen.fill(black)
 
-maze = Maze(10, 15, screenSize)
+maze = Maze(10, 10, screenSize)
 
 player = Player(size = (25, 25), boundaries = screenSize, step = 50)
 player.position = 12.5, 12.5

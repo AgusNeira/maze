@@ -7,10 +7,19 @@ class Maze:
     DY = { N: -1, S: 1, W: 0, E: 0 }
     OPPOSITE = { N: S, S: N, W: E, E: W }
 
-    def __init__(self, rows, cols, size):
-        self._size = size
-        self._rows = rows
-        self._cols = cols
+    def __init__(self, cols, rows, size):
+
+        # Adjust maze size to fit all the square cells
+        if size[0] / cols > size[1] / rows:
+            self.cellSize = size[1] / rows
+            self.position = (size[0] - self.cellSize * cols) / 2, 0
+        else:
+            self.cellSize = size[0] / cols
+            self.position = 0, (size[1] - self.cellSize * rows) / 2
+
+        self.size = [self.cellSize * cells for cells in [rows, cols]]
+        self.rows = rows
+        self.cols = cols
 
         self._grid = [[0 for _ in range(rows)] for _ in range(cols)]
         self.generate()
@@ -37,7 +46,7 @@ class Maze:
 
             for direction in random.sample([Maze.N, Maze.S, Maze.W, Maze.E], k=4):
                 nx, ny = x + Maze.DX[direction], y + Maze.DY[direction]
-                if nx >= 0 and nx < self._cols and ny >= 0 and ny < self._rows and self._grid[nx][ny] == 0:
+                if nx >= 0 and nx < self.cols and ny >= 0 and ny < self.rows and self._grid[nx][ny] == 0:
                     self._grid[x][y] |= direction
                     self._grid[nx][ny] |= Maze.OPPOSITE[direction]
                     cells.append((nx, ny))
@@ -66,31 +75,35 @@ class Maze:
             else:
                 return [*previous, curr]
 
-        for y in range(self._rows):
-            for x in range(self._cols):
+        for y in range(self.rows):
+            for x in range(self.cols):
+                if y == 0 and self._grid[x][y] & Maze.N == 0:
+                    h_walls.append((x, y, 1))
                 if self._grid[x][y] & Maze.S == 0:
-                    h_walls.append((x, y, 1)) 
+                    h_walls.append((x, y + 1, 1)) 
 
-        for x in range(self._cols):
-            for y in range(self._rows):
-                if self._grid[x][y] & Maze.E == 0:
+        for x in range(self.cols):
+            for y in range(self.rows):
+                if x == 0 and self._grid[x][y] & Maze.W == 0:
                     v_walls.append((x, y, 1))
+                if self._grid[x][y] & Maze.E == 0:
+                    v_walls.append((x + 1, y, 1))
 
         h_walls = reduce(group_h_walls, h_walls[1:], [h_walls[0]])
         v_walls = reduce(group_v_walls, v_walls[1:], [v_walls[0]])
 
         # Actual drawing
-        cell_size = self._size[0] / self._cols, self._size[1] / self._rows
+        cell_size = self.size[0] / self.cols, self.size[1] / self.rows
         wall_color = pygame.Color(255, 255, 255)
         for wall in h_walls:
-            start_pos = wall[0] * cell_size[0], (wall[1] + 1) * cell_size[1]
-            end_pos = (wall[0] + wall[2]) * cell_size[0], start_pos[1]
+            start_pos = wall[0] * self.cellSize, wall[1] * self.cellSize
+            end_pos = (wall[0] + wall[2]) * self.cellSize, start_pos[1]
             pygame.draw.line(self._surface, wall_color, start_pos, end_pos)
 
         for wall in v_walls:
-            start_pos = (wall[0] + 1) * cell_size[0], wall[1] * cell_size[1]
-            end_pos = start_pos[0], (wall[1] + wall[2]) * cell_size[1]
+            start_pos = wall[0] * self.cellSize, wall[1] * self.cellSize
+            end_pos = start_pos[0], (wall[1] + wall[2]) * self.cellSize
             pygame.draw.line(self._surface, wall_color, start_pos, end_pos)
 
     def draw(self, surface):
-        surface.blit(self._surface, (0, 0))
+        surface.blit(self._surface, self.position)
