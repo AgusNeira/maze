@@ -53,8 +53,9 @@ while 1:
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE: sys.exit()
 
-    if scene.tick() == Maze.WIN:
-        scene = WinScreen(screenSize)
+    moves = scene.tick()
+    if moves is not None:
+        scene = WinScreen(screenSize, moves)
     screen.fill(black)
     scene.draw(screen)
 
