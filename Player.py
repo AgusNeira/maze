@@ -24,6 +24,7 @@ class Player:
         self._color = kwargs.get("color", pygame.Color(255, 255, 255))
         self._boundaries = kwargs.get("boundaries", None)
         self._step = kwargs['step']
+        self._halfStep = kwargs.get('halfStep', self._step / 4)
 
         self.moves_queue = []
 
@@ -38,25 +39,23 @@ class Player:
     def draw(self, surface):
         surface.blit(self.surface, self.position)
 
-    def enqueueMovement(self, direction):
-        if len(self.moves_queue) > 0:
-            nmovement = Movement(self._step,
+    def enqueueMovement(self, direction, halfStep = False):
+        nmovement = Movement(self._step if not halfStep else self._halfStep,
                     direction, 
                     end = self.dequeueMovement,
-                    lastMove = self.moves_queue[-1],
-                    limits = [b - s for b, s in zip(self.boundaries, self.size)])
-        else:
-            nmovement = Movement(self._step,
-                    direction,
-                    end = self.dequeueMovement,
-                    startPos = self.position,
-                    limits= [b - s for b, s in zip(self.boundaries, self.size)])
+                    startPos = self.finalPosition(),
+                    bounce = halfStep)
 
         self.moves_queue.append(nmovement)
 
     def dequeueMovement(self):
-        nextMoveStart = self.moves_queue[0].endPosition()
         del self.moves_queue[0]
+
+    def finalPosition(self):
+        if len(self.moves_queue) > 0:
+            return self.moves_queue[-1].endPosition()
+        else:
+            return self.position
 
     @property
     def size(self):

@@ -22,6 +22,10 @@ class Maze:
         self.rows = rows
         self.cols = cols
 
+        # The grid holds information about which passages are free
+        # Coded in 4 bits (1, 2, 4, 8 for N, S, W, E)
+        # Meaning the presence of the bit indicates the absence of the wall,
+        # and viceversa
         self._grid = [[0 for _ in range(rows)] for _ in range(cols)]
         self.generate()
 
@@ -34,7 +38,7 @@ class Maze:
         playerOffset = [self.cellSize / 4] * 2
         self.player = Player(size = playerSize, step = self.cellSize)
         self.player.position = [pos + off for pos, off in zip(self.position, playerOffset)]
-        self.player.speed = 5
+        self.player.speed = 10
         self.player.color = 0, 0, 0
 
     def generate(self):
@@ -64,6 +68,9 @@ class Maze:
             if curr_cell != -1:
                 del cells[curr_cell]
 
+    def isThereAWall(self, col, row, direction):
+        return self._grid[col][row] & direction == 0
+
     def draw_walls(self):
         h_walls = []
         v_walls = []
@@ -85,16 +92,16 @@ class Maze:
 
         for y in range(self.rows):
             for x in range(self.cols):
-                if y == 0 and self._grid[x][y] & Maze.N == 0:
+                if y == 0 and self.isThereAWall(x, y, Maze.N):
                     h_walls.append((x, y, 1))
-                if self._grid[x][y] & Maze.S == 0:
+                if self.isThereAWall(x, y, Maze.S):
                     h_walls.append((x, y + 1, 1)) 
 
         for x in range(self.cols):
             for y in range(self.rows):
-                if x == 0 and self._grid[x][y] & Maze.W == 0:
+                if x == 0 and self.isThereAWall(x, y, Maze.W):
                     v_walls.append((x, y, 1))
-                if self._grid[x][y] & Maze.E == 0:
+                if self.isThereAWall(x, y, Maze.E):
                     v_walls.append((x + 1, y, 1))
 
         h_walls = reduce(group_h_walls, h_walls[1:], [h_walls[0]])
@@ -121,4 +128,16 @@ class Maze:
         self.player.draw(surface)
 
     def listen(self, event):
-        pass
+        if event.type == pygame.KEYDOWN:
+            col, row = self.interpolateCellIndex(*self.player.finalPosition())
+            if event.key == pygame.K_UP:
+                self.player.enqueueMovement(Maze.N, halfStep = self.isThereAWall(col, row, Maze.N))
+            elif event.key == pygame.K_DOWN:
+                self.player.enqueueMovement(Maze.S, halfStep = self.isThereAWall(col, row, Maze.S))
+            elif event.key == pygame.K_LEFT:
+                self.player.enqueueMovement(Maze.W, halfStep = self.isThereAWall(col, row, Maze.W))
+            elif event.key == pygame.K_RIGHT:
+                self.player.enqueueMovement(Maze.E, halfStep = self.isThereAWall(col, row, Maze.E))
+
+    def interpolateCellIndex(self, x, y):
+        return int((x - self.position[0]) / self.cellSize), int((y - self.position[1]) / self.cellSize)
