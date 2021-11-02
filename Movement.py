@@ -1,13 +1,17 @@
+
 # Helper class for players' movements
 #
 # The movements use an ease-in-out function that starts and ends slowly,
 # reaching peak velocity at half-movement
 
 class Movement:
-    NORTH = lambda x, y, delta: (x, y - delta)
-    EAST = lambda x, y, delta: (x + delta, y)
-    SOUTH = lambda x, y, delta: (x, y + delta)
-    WEST = lambda x, y, delta: (x - delta, y)
+    N, S, W, E = 1, 2, 4, 8
+    DIRECTIONS = {
+            N: lambda x, y, delta: (x, y - delta),
+            E: lambda x, y, delta: (x + delta, y),
+            S: lambda x, y, delta: (x, y + delta),
+            W: lambda x, y, delta: (x - delta, y)
+    }
 
     def isOutOfBounds(position, bounds):
         if position[0] < 0 or position[1] < 0:
@@ -24,7 +28,7 @@ class Movement:
         else:
             raise KeyError('Must provide either startPos or lastMve')
 
-        self.direction = direction
+        self.direction = Movement.DIRECTIONS[direction]
         self._distance = distance
         self.timeDelta = kwargs.get('timeDelta', 0.03)
         self.onEnd = kwargs.get('end', lambda: None)

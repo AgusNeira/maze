@@ -121,4 +121,12 @@ class Maze:
         self.player.draw(surface)
 
     def listen(self, event):
-        pass
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_UP:
+                self.player.enqueueMovement(Maze.N, halfStep = False)
+            elif event.key == pygame.K_DOWN:
+                self.player.enqueueMovement(Maze.S, halfStep = False)
+            elif event.key == pygame.K_LEFT:
+                self.player.enqueueMovement(Maze.W, halfStep = False)
+            elif event.key == pygame.K_RIGHT:
+                self.player.enqueueMovement(Maze.E, halfStep = False)

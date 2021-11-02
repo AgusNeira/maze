@@ -19,17 +19,6 @@ while 1:
     for event in pygame.event.get():
         maze.listen(event)
         if event.type == pygame.QUIT: sys.exit()
-        '''elif event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_UP:
-                player.enqueueMovement(Movement.NORTH)
-            elif event.key == pygame.K_DOWN:
-                player.enqueueMovement(Movement.SOUTH)            
-            elif event.key == pygame.K_LEFT:
-                player.enqueueMovement(Movement.WEST)
-            elif event.key == pygame.K_RIGHT:
-                player.enqueueMovement(Movement.EAST)
-        elif event.type == pygame.KEYUP:
-            player.movement = None'''
 
     maze.tick()
     screen.fill(black)

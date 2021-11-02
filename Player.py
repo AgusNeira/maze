@@ -38,19 +38,17 @@ class Player:
     def draw(self, surface):
         surface.blit(self.surface, self.position)
 
-    def enqueueMovement(self, direction):
+    def enqueueMovement(self, direction, **kwargs):
         if len(self.moves_queue) > 0:
             nmovement = Movement(self._step,
                     direction, 
                     end = self.dequeueMovement,
-                    lastMove = self.moves_queue[-1],
-                    limits = [b - s for b, s in zip(self.boundaries, self.size)])
+                    lastMove = self.moves_queue[-1])
         else:
             nmovement = Movement(self._step,
                     direction,
                     end = self.dequeueMovement,
-                    startPos = self.position,
-                    limits= [b - s for b, s in zip(self.boundaries, self.size)])
+                    startPos = self.position)
 
         self.moves_queue.append(nmovement)
 
