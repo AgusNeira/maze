@@ -57,6 +57,9 @@ class Player:
         else:
             return self.position
 
+    def isMoving(self):
+        return len(self.moves_queue) == 0
+
     @property
     def size(self):
         return self.width, self.height

@@ -5,7 +5,7 @@ from Maze import Maze
 
 pygame.init()
 
-screenSize = width, height = 900, 600
+screenSize = width, height = 1280, 720
 speed = 2, 2
 black = pygame.Color(0, 0, 0)
 white = pygame.Color(255, 255, 255)
@@ -13,7 +13,7 @@ white = pygame.Color(255, 255, 255)
 screen = pygame.display.set_mode(screenSize, pygame.FULLSCREEN | pygame.SCALED)
 screen.fill(black)
 
-maze = Maze(30, 30, screenSize)
+maze = Maze(10, 10, screenSize)
 
 while 1:
     for event in pygame.event.get():
