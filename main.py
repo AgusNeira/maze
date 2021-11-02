@@ -3,6 +3,7 @@ from Player import Player
 from Movement import Movement
 from Maze import Maze
 from StartMenu import StartMenu
+from LevelMenu import LevelMenu
 
 pygame.init()
 
@@ -21,9 +22,21 @@ while 1:
         code = scene.listen(event)
         if scene.name == 'start':
             if code == StartMenu.PLAY:
-                scene = Maze(10, 10, screenSize)
+                scene = LevelMenu(screenSize)
             elif code == StartMenu.EXIT:
                 sys.exit()
+        elif scene.name == 'level':
+            if code == LevelMenu.L1:
+                scene = Maze(10, 10, screenSize)
+            elif code == LevelMenu.L2:
+                scene = Maze(15, 10, screenSize)
+            elif code == LevelMenu.L3:
+                scene = Maze(20, 20, screenSize)
+            elif code == LevelMenu.L4:
+                scene = Maze(40, 25, screenSize)
+            elif code == LevelMenu.L5:
+                scene = Maze(50, 30, screenSize)
+
         if event.type == pygame.QUIT: sys.exit()
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE: sys.exit()
