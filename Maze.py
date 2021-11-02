@@ -9,7 +9,7 @@ class Maze:
     OPPOSITE = { N: S, S: N, W: E, E: W }
 
     def __init__(self, cols, rows, size):
-
+        self.name = 'maze'
         # Adjust maze size to fit all the square cells
         if size[0] / cols > size[1] / rows:
             self.cellSize = size[1] / rows

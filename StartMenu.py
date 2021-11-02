@@ -1,9 +1,11 @@
 import pygame
 
 class StartMenu:
+    PLAY, EXIT = 1, 2
     def __init__(self, size):
         self.size = size
         pygame.font.init()
+        self.name = 'start'
 
         self.surface = pygame.Surface(self.size)
         bigFont = pygame.font.Font('./Early GameBoy.ttf', 32)
@@ -49,6 +51,9 @@ class StartMenu:
             elif event.key == pygame.K_RETURN:
                 return self.menuOptions[self.currOption]['code']
         return 0
+
+    def tick(self):
+        pass
 
     def centerHorizontally(self, txtSurface):
         return (self.size[0] - txtSurface.get_width()) / 2
