@@ -113,7 +113,6 @@ class Maze:
         winSquareLeft = self.size[0] - self.cellSize
         winSquareTop = self.size[1] - self.cellSize
         winSquareRect = pygame.Rect(winSquareLeft, winSquareTop, self.cellSize, self.cellSize)
-        print(winSquareRect)
         pygame.draw.rect(self._surface, pygame.Color(255, 0, 0), winSquareRect)
 
         # Actual drawing
