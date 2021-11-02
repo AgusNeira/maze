@@ -28,7 +28,8 @@ while 1:
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE: sys.exit()
 
-    scene.tick()
+    if scene.tick() == Maze.WIN:
+        scene = StartMenu(screenSize)
     screen.fill(black)
     scene.draw(screen)
 

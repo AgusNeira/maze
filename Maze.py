@@ -8,6 +8,8 @@ class Maze:
     DY = { N: -1, S: 1, W: 0, E: 0 }
     OPPOSITE = { N: S, S: N, W: E, E: W }
 
+    WIN = 1
+
     def __init__(self, cols, rows, size):
         self.name = 'maze'
         # Adjust maze size to fit all the square cells
@@ -129,7 +131,7 @@ class Maze:
     def tick(self):
         self.player.tick()
         if not self.player.isMoving() and self.goalReached(self.interpolateCellIndex(self.player.position)):
-            sys.exit()
+            return Maze.WIN
 
     def draw(self, surface):
         surface.blit(self._surface, self.position)
