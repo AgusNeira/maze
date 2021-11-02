@@ -1,6 +1,7 @@
 import pygame, random, sys
 from functools import reduce
 from Player import Player
+from FontPool import FontPool
 
 class Maze:
     N, S, W, E = 1, 2, 4, 8
@@ -8,17 +9,16 @@ class Maze:
     DY = { N: -1, S: 1, W: 0, E: 0 }
     OPPOSITE = { N: S, S: N, W: E, E: W }
 
-    WIN = 1
-
     def __init__(self, cols, rows, size):
         self.name = 'maze'
         # Adjust maze size to fit all the square cells, with a 10px margin
-        if size[0] / cols > size[1] / rows:
-            self.cellSize = (size[1] - 20) / rows
-            self.position = (size[0] - self.cellSize * cols) / 2, 10
+        # and 30px on top to hold movement counter
+        if size[0] / cols > (size[1] - 30) / rows:
+            self.cellSize = (size[1] - 50) / rows
+            self.position = (size[0] - self.cellSize * cols) / 2, 40
         else:
             self.cellSize = (size[0] - 20) / cols
-            self.position = 10, (size[1] - self.cellSize * rows) / 2
+            self.position = 10, (size[1] - self.cellSize * rows) / 2 + 30
 
         self.size = [self.cellSize * cells for cells in [cols, rows]]
         self.rows = rows
@@ -42,6 +42,9 @@ class Maze:
         self.player.position = [pos + off for pos, off in zip(self.position, playerOffset)]
         self.player.speed = 10
         self.player.color = 0, 0, 0
+
+        self.moves = 0
+        self.updateMovesCounter()
 
     def generate(self):
         def choose_index(ceil):
@@ -131,10 +134,11 @@ class Maze:
     def tick(self):
         self.player.tick()
         if not self.player.isMoving() and self.goalReached(self.interpolateCellIndex(self.player.position)):
-            return Maze.WIN
+            return self.moves
 
     def draw(self, surface):
         surface.blit(self._surface, self.position)
+        surface.blit(self.movesCounter, self.movesCounterPos)
         self.player.draw(surface)
 
     def listen(self, event):
@@ -142,12 +146,17 @@ class Maze:
             col, row = self.interpolateCellIndex(self.player.finalPosition())
             if event.key == pygame.K_UP:
                 self.player.enqueueMovement(Maze.N, halfStep = self.isThereAWall(col, row, Maze.N))
+                self.moves += 1
             elif event.key == pygame.K_DOWN:
                 self.player.enqueueMovement(Maze.S, halfStep = self.isThereAWall(col, row, Maze.S))
+                self.moves += 1
             elif event.key == pygame.K_LEFT:
                 self.player.enqueueMovement(Maze.W, halfStep = self.isThereAWall(col, row, Maze.W))
+                self.moves += 1
             elif event.key == pygame.K_RIGHT:
                 self.player.enqueueMovement(Maze.E, halfStep = self.isThereAWall(col, row, Maze.E))
+                self.moves += 1
+            self.updateMovesCounter()
 
     def interpolateCellIndex(self, pos):
         x, y = pos
@@ -156,3 +165,8 @@ class Maze:
     def goalReached(self, pos):
         col, row = pos
         return col == self.cols - 1 and row == self.rows - 1
+
+    def updateMovesCounter(self):
+        self.movesCounter = FontPool.get(18)\
+                .render('Moves: %d' % self.moves, False, pygame.Color(255, 255, 255))
+        self.movesCounterPos = self.position[0] + self.size[0] - self.movesCounter.get_width() - 20, 6

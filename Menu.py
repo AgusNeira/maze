@@ -1,4 +1,5 @@
 import pygame
+from FontPool import FontPool
 
 class Menu:
     def __init__(self, size, title, options):
@@ -7,11 +8,13 @@ class Menu:
 
         self.surface = pygame.Surface(self.size)
 
-        bigFont = pygame.font.Font('./Early GameBoy.ttf', 32)
-        font = pygame.font.Font('./Early GameBoy.ttf', 18)
+        bigFont = FontPool.get(32)
+        font = FontPool.get(18)
 
-        self.title = bigFont.render(title, False, pygame.Color(255, 255, 255))
-        self.titlePos = self.centerHorizontally(self.title), self.size[1] // 4
+        titles = title.split('\n')
+
+        self.titles = [bigFont.render(ti, False, pygame.Color(255, 255, 255)) for ti in titles]
+        self.titlePos = [(self.centerHorizontally(ti), self.size[1] // 4 + 40 * i) for i, ti in enumerate(self.titles)]
 
         self.menuOptions = options
         self.initOptions(font, self.size[1] * 2.5 // 4, 24)
@@ -30,7 +33,7 @@ class Menu:
 
     def draw(self, surface):
         self.surface.fill(pygame.Color(0, 0, 0))
-        self.surface.blit(self.title, self.titlePos)
+        [self.surface.blit(ti, pos) for ti, pos in zip(self.titles, self.titlePos)]
         for option in self.menuOptions:
             self.surface.blit(option['surface'], option['position'])
         self.surface.blit(self.cursor['surface'], self.cursor['position'])
