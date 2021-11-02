@@ -21,30 +21,13 @@ class Movement:
         return False
     
     def __init__(self, distance, direction, **kwargs):
-        if 'startPos' in kwargs:
-            self._start = kwargs['startPos']
-        elif 'lastMove' in kwargs:
-            self._start = kwargs['lastMove'].endPosition()
-        else:
-            raise KeyError('Must provide either startPos or lastMve')
 
+        self._start = kwargs['startPos']
         self.direction = Movement.DIRECTIONS[direction]
         self._distance = distance
         self.timeDelta = kwargs.get('timeDelta', 0.03)
         self.onEnd = kwargs.get('end', lambda: None)
         self._bounce = kwargs.get('bounce', False)
-
-        if 'limits' in kwargs:
-            if Movement.isOutOfBounds(self.endPosition(), kwargs['limits']):
-                if self.direction == Movement.NORTH:
-                    self._distance = self._start[1]
-                elif self.direction == Movement.WEST:
-                    self._distance = self.start[0]
-                elif self.direction == Movement.SOUTH:
-                    self._distance = kwargs['limits'][1] - self._start[1]
-                elif self.direction == Movement.EAST:
-                    self._distance = kwargs['limits'][0] - self.start[0]
-                self._bounce = True
 
         self._now = self._start
         self.time = 0 # 0 to 1, increasing by a rate of step
