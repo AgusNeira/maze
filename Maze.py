@@ -1,4 +1,4 @@
-import pygame, random
+import pygame, random, sys
 from functools import reduce
 from Player import Player
 
@@ -106,6 +106,12 @@ class Maze:
 
         h_walls = reduce(group_h_walls, h_walls[1:], [h_walls[0]])
         v_walls = reduce(group_v_walls, v_walls[1:], [v_walls[0]])
+        
+        # Adding the winning square
+        winSquareLeft = self.size[0] - self.cellSize
+        winSquareTop = self.size[1] - self.cellSize
+        winSquareRect = pygame.Rect(winSquareLeft, winSquareTop, self.cellSize, self.cellSize)
+        self._surface.fill(pygame.Color(255, 0, 0), rect=winSquareRect)
 
         # Actual drawing
         cell_size = self.size[0] / self.cols, self.size[1] / self.rows
@@ -119,9 +125,11 @@ class Maze:
             start_pos = wall[0] * self.cellSize, wall[1] * self.cellSize
             end_pos = start_pos[0], (wall[1] + wall[2]) * self.cellSize
             pygame.draw.line(self._surface, wall_color, start_pos, end_pos)
-
+        
     def tick(self):
         self.player.tick()
+        if not self.player.isMoving() and self.goalReached(self.interpolateCellIndex(self.player.position)):
+            sys.exit()
 
     def draw(self, surface):
         surface.blit(self._surface, self.position)
@@ -129,7 +137,7 @@ class Maze:
 
     def listen(self, event):
         if event.type == pygame.KEYDOWN:
-            col, row = self.interpolateCellIndex(*self.player.finalPosition())
+            col, row = self.interpolateCellIndex(self.player.finalPosition())
             if event.key == pygame.K_UP:
                 self.player.enqueueMovement(Maze.N, halfStep = self.isThereAWall(col, row, Maze.N))
             elif event.key == pygame.K_DOWN:
@@ -139,5 +147,10 @@ class Maze:
             elif event.key == pygame.K_RIGHT:
                 self.player.enqueueMovement(Maze.E, halfStep = self.isThereAWall(col, row, Maze.E))
 
-    def interpolateCellIndex(self, x, y):
+    def interpolateCellIndex(self, pos):
+        x, y = pos
         return int((x - self.position[0]) / self.cellSize), int((y - self.position[1]) / self.cellSize)
+
+    def goalReached(self, pos):
+        col, row = pos
+        return col == self.cols - 1 and row == self.rows - 1
