@@ -12,15 +12,15 @@ class Maze:
 
     def __init__(self, cols, rows, size):
         self.name = 'maze'
-        # Adjust maze size to fit all the square cells
+        # Adjust maze size to fit all the square cells, with a 10px margin
         if size[0] / cols > size[1] / rows:
-            self.cellSize = size[1] / rows
-            self.position = (size[0] - self.cellSize * cols) / 2, 0
+            self.cellSize = (size[1] - 20) / rows
+            self.position = (size[0] - self.cellSize * cols) / 2, 10
         else:
-            self.cellSize = size[0] / cols
-            self.position = 0, (size[1] - self.cellSize * rows) / 2
+            self.cellSize = (size[0] - 20) / cols
+            self.position = 10, (size[1] - self.cellSize * rows) / 2
 
-        self.size = [self.cellSize * cells for cells in [rows, cols]]
+        self.size = [self.cellSize * cells for cells in [cols, rows]]
         self.rows = rows
         self.cols = cols
 
@@ -113,7 +113,8 @@ class Maze:
         winSquareLeft = self.size[0] - self.cellSize
         winSquareTop = self.size[1] - self.cellSize
         winSquareRect = pygame.Rect(winSquareLeft, winSquareTop, self.cellSize, self.cellSize)
-        self._surface.fill(pygame.Color(255, 0, 0), rect=winSquareRect)
+        print(winSquareRect)
+        pygame.draw.rect(self._surface, pygame.Color(255, 0, 0), winSquareRect)
 
         # Actual drawing
         cell_size = self.size[0] / self.cols, self.size[1] / self.rows
