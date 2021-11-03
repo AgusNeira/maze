@@ -55,7 +55,8 @@ class Maze:
                 return random.randrange(ceil)
 
         # Select a random cell to start from
-        cells = [(0, 0)]
+        cells = [(random.randrange(self.cols), random.randrange(self.rows))]
+        print(cells)
 
         while len(cells) > 0:
             curr_cell = choose_index(len(cells))
