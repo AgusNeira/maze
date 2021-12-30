@@ -23,8 +23,9 @@ getMaze = {
     LevelMenu.L1: lambda sz: Maze(10, 10, sz),
     LevelMenu.L2: lambda sz: Maze(15, 10, sz),
     LevelMenu.L3: lambda sz: Maze(20, 20, sz),
-    LevelMenu.L4: lambda sz: Maze(40, 25, sz),
-    LevelMenu.L5: lambda sz: Maze(50, 30, sz)
+    LevelMenu.L4: lambda sz: Maze(30, 25, sz),
+    LevelMenu.L5: lambda sz: Maze(40, 25, sz),
+    LevelMenu.L6: lambda sz: Maze(50, 30, sz)
 }
 
 while 1:
